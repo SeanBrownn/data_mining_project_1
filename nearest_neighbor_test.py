@@ -6,13 +6,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
 
+# weight function used in our implementation of nearest neighbor
 def weight_function(distances):
     return np.power(distances, -2)
 
 
 class nearest_neighbor_test(unittest.TestCase):
-
-    # weight function used in our implementation of nearest neighbor
 
     def test_nearest_neighbor(self):
         dataset1 = main.dataset1
