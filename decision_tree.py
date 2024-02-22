@@ -4,8 +4,6 @@ import main
 
 dataset1 = main.dataset1
 dataset2 = main.dataset2
-dataset1 = dataset1.rename(columns={dataset1.columns[-1]: 'class'})
-dataset2 = dataset2.rename(columns={dataset2.columns[-1]: 'class'})
 
 
 class node:
@@ -147,8 +145,8 @@ def classify(tree, record):
 
 
 # builds a decision tree from the labeled records, classifies the unlabeled records
+# assumes that 'class' is the last column in labeled_records
 def decision_tree(labeled_records, unlabeled_records):
-    labeled_records = labeled_records.rename(columns={labeled_records.columns[-1]: 'class'})
     tree = hunts(labeled_records, labeled_records.columns.tolist())
     # classifies each row and adds result to a list
     return [classify(tree, unlabeled_records.iloc[i, :]) for i in range(len(unlabeled_records.index))]
