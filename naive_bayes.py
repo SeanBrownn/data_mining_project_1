@@ -67,8 +67,8 @@ class NaiveBayesClassifier:
             # Append the prediction for the class this sample is most likely to belong to
             predictions.append(best_label)
         return predictions
-    
-
+   
+'''
 # Now test the Classifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -123,4 +123,4 @@ predictions = classifier.predict(X_test)
 
 # Use accuracy_score to calculate accuracy of predictions
 accuracy = accuracy_score(y_test, predictions)
-print("Accuracy on dataset2:", accuracy)
+print("Accuracy on dataset2:", accuracy)'''

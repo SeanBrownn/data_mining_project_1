@@ -48,7 +48,6 @@ class SVM:
     def predict(self, X):
         return np.sign(np.dot(X, self.w) + self.b[0])
     
-
 import main
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
