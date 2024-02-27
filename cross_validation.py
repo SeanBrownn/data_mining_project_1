@@ -6,6 +6,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import main
 import naive_bayes
 import svm
+import nearest_neighbor
 
 random.seed(42)
 np.random.seed(42)
@@ -98,3 +99,48 @@ print()
 print("SVM on dataset2:")
 svm_performance = kfold_cv(svm, data2)
 print_performance_metrics(svm_performance)
+
+def kfold_cv_nearest_neighbor(data, k):
+    folds = 10  # Define folds as 10, for simplicity
+
+    total_accuracy = 0
+    total_precision = 0
+    total_recall = 0
+    total_f1 = 0
+
+    folds_data = split(data)  # Use the split function provided to get the folds
+
+    for i in range(folds):
+        test_fold = folds_data[i]
+        train_folds = pd.concat([fold for j, fold in enumerate(folds_data) if j != i], axis=0)
+
+        predicted_labels = nearest_neighbor.nearest_neighbor(train_folds, test_fold, k)
+
+        # Extract the true labels from the test fold
+        true_labels = test_fold.iloc[:, -1].values
+
+        # Calculate performance metrics
+        total_accuracy += accuracy_score(true_labels, predicted_labels)
+        total_precision += precision_score(true_labels, predicted_labels, average='macro', zero_division=0)
+        total_recall += recall_score(true_labels, predicted_labels, average='macro', zero_division=0)
+        total_f1 += f1_score(true_labels, predicted_labels, average='macro', zero_division=0)
+    
+    # Calculate average of each metric
+    average_accuracy = total_accuracy / folds
+    average_precision = total_precision / folds
+    average_recall = total_recall / folds
+    average_f1 = total_f1 / folds
+
+    return average_accuracy, average_precision, average_recall, average_f1
+
+
+print()
+k_value = 3
+print("Nearest Neighbors on dataset1:")
+nn_performance = kfold_cv_nearest_neighbor(data1, k_value)
+print_performance_metrics(nn_performance)
+print()
+print("Nearest Neighbors on dataset2:")
+nn_performance = kfold_cv_nearest_neighbor(data2, k_value)
+print_performance_metrics(nn_performance)
+print()

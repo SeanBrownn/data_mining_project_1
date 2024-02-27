@@ -47,7 +47,9 @@ class SVM:
 
     def predict(self, X):
         return np.sign(np.dot(X, self.w) + self.b[0])
-    
+
+   
+# Quick test of SVM before cross validation
 import main
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -69,7 +71,7 @@ classifier.fit(X_train, y_train)
 # Use trained classifier to make predictions
 predictions = classifier.predict(X_test)
 
-print("Accuracy on dataset 1:", accuracy_score(y_test, predictions))
+#print("Accuracy on dataset 1:", accuracy_score(y_test, predictions))
 
 # Test on dataset2
 data2 = main.dataset2
@@ -90,4 +92,4 @@ classifier.fit(X_train, y_train)
 # Use trained classifier to make predictions
 predictions = classifier.predict(X_test)
 
-print("Accuracy on dataset 2:", accuracy_score(y_test, predictions))
+#print("Accuracy on dataset 2:", accuracy_score(y_test, predictions))
