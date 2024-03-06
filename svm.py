@@ -1,53 +1,49 @@
 import numpy as np
+import pandas as pd
 from cvxopt import matrix, solvers
 
 class SVM:
-    def __init__(self, C=15):
-        self.C = C  # Regularization parameter
-        self.alphas = None  # Lagrange multiplier of each data point in training data
-        self.w = None   # Weights
-        self.b = None   # Bias
 
-    # Fit a SVM classifier
+    def __init__(self, learning_rate=0.001, lambda_param=0.01, epochs=1000, C=1):
+        self.lr = learning_rate
+        self.lambda_param = lambda_param
+        self.epochs = epochs
+        self.C = C
+        self.w = None
+        self.b = None
+        
     def fit(self, X, y):
-        # Store the shape of the input X, for use in our matrix math
-        n_samples, n_features = X.shape
+        # Convert the inputs to numpy, used for dot product calculations later
+        X = X.to_numpy()
+        y = y.to_numpy()
 
-        # Convert target variable into a column vector
-        y = y.values.reshape(-1, 1) * 1
-
-        # Scale each feature in X by its corresponding label
-        X_dash = y * X
-
-        # Calculates Hessian matrix
-        H = np.dot(X_dash, X_dash.T) * 1
-
-        #Converting into cvxopt format
-        P = matrix(H)
-        q = matrix(-np.ones((n_samples, 1)))
-        G = matrix(np.vstack((np.eye(n_samples)*-1,np.eye(n_samples))))
-        h = matrix(np.hstack((np.zeros(n_samples), np.ones(n_samples) * self.C)))
-        A = matrix(y.reshape(1, -1))
-        b = matrix(np.zeros(1))
-
-        solvers.options['show_progress'] = False
-
-        # Solve the matrix
-        sol = solvers.qp(P, q, G, h, A, b)
-
-        # Extract and reshape the optimized Lagrange multipliers
-        self.alphas = np.array(sol['x']).reshape(-1, 1)
-
-        # Update the weights
-        self.w = ((y * self.alphas).T @ X).values.reshape(-1,1)
-
-        S = (self.alphas > 1e-4).flatten()
-        # Update the bias
-        self.b = y[S] - np.dot(X[S], self.w)
-
+        # Compute n and m, which will be used to initialize the weights numpy
+        n, m = X.shape
+        
+        # Initialize the weights and bias to 0
+        self.w = np.zeros(m)
+        self.b = 0
+        
+        # Loop through the dataset 'epoch' times
+        # Updating the weights using stochastic gradient descent
+        for _ in range(self.epochs):
+            # Loop through each row of X
+            for i, x in enumerate(X):
+                # Check if the sample would be classified as 1 
+                classification = y[i] * (np.dot(x, self.w) - self.b) >= 1
+            
+                # Update weights and bias depending on which class the feature would be predicted in
+                # Using the current weights and bias
+                if classification:
+                    self.w -= self.lr * (2 * self.lambda_param * self.w)
+                else:
+                    self.w -= self.lr * (2 * self.lambda_param * self.w - (np.dot(x, y[i])))
+                    self.b -= self.lr * self.C * y[i]
+                    
     def predict(self, X):
-        return np.sign(np.dot(X, self.w) + self.b[0])
-
+        X = X.to_numpy()
+        activation_function = np.dot(X, self.w) - self.b
+        return np.sign(activation_function)
    
 # Quick test of SVM before cross validation
 import main
@@ -71,7 +67,7 @@ classifier.fit(X_train, y_train)
 # Use trained classifier to make predictions
 predictions = classifier.predict(X_test)
 
-#print("Accuracy on dataset 1:", accuracy_score(y_test, predictions))
+# print("Accuracy on dataset 1:", accuracy_score(y_test, predictions))
 
 # Test on dataset2
 data2 = main.dataset2
@@ -92,4 +88,4 @@ classifier.fit(X_train, y_train)
 # Use trained classifier to make predictions
 predictions = classifier.predict(X_test)
 
-#print("Accuracy on dataset 2:", accuracy_score(y_test, predictions))
+# print("Accuracy on dataset 2:", accuracy_score(y_test, predictions))

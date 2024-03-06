@@ -90,14 +90,17 @@ print_performance_metrics(naive_bayes_performance)
 
 print()
 
-# Create SVM and run performance on 2 datasets
-svm = svm.SVM()
+# Create SVM with optimal parameters for the first dataset
+classifier = svm.SVM(learning_rate=0.001, lambda_param=0.001, epochs=1000, C=0.1)
 print("SVM on dataset1:")
-svm_performance = kfold_cv(svm, data1)
+svm_performance = kfold_cv(classifier, data1)
 print_performance_metrics(svm_performance)
 print()
+
+# Create SVM with optimal parameters for the second dataset
+classifier = svm.SVM(learning_rate=0.001, lambda_param=0.001, epochs=100, C=10)
 print("SVM on dataset2:")
-svm_performance = kfold_cv(svm, data2)
+svm_performance = kfold_cv(classifier, data2)
 print_performance_metrics(svm_performance)
 
 def kfold_cv_nearest_neighbor(data, k):
