@@ -35,7 +35,7 @@ class ada_boost_classifier:
             # samples with replacement based on weights
             selected_indices = random.choices(np.arange(number_of_records), weights=weights, k=number_of_records)
             training_data = x_train.iloc[selected_indices]
-            training_labels=decision_tree.decision_tree_classifier.subset_labels(training_data, y_train)
+            training_labels=pd.Series(decision_tree.decision_tree_classifier.subset_labels(training_data, y_train))
             training_data.reset_index(drop=True, inplace=True)
 
             # builds a decision tree from training set, then returns class labels for the entire dataset

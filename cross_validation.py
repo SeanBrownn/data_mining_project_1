@@ -9,6 +9,7 @@ import svm
 import decision_tree
 import nearest_neighbor
 import ada_boost
+from sklearn.model_selection import train_test_split
 
 random.seed(42)
 np.random.seed(42)
@@ -108,26 +109,49 @@ print_performance_metrics(svm_performance)
 print()
 
 # Create decision tree and run performance on 2 datasets
-classifier = decision_tree.decision_tree_classifier(max_depth=6)
+classifier = decision_tree.decision_tree_classifier(max_depth=2)
 print("Decision Tree on dataset1:")
 tree_performance = kfold_cv(classifier, data1)
 print_performance_metrics(tree_performance)
 
-classifier = decision_tree.decision_tree_classifier(max_depth=6)
+classifier = decision_tree.decision_tree_classifier(max_depth=2)
 print("Decision Tree on dataset2:")
 tree_performance = kfold_cv(classifier, data2)
 print_performance_metrics(tree_performance)
 
 # Create adaboost and run performance on 2 datasets
-classifier = ada_boost.ada_boost_classifier(8, 2)
+classifier = ada_boost.ada_boost_classifier(3, 2)
 print("AdaBoost on dataset1:")
-ada_performance = kfold_cv(classifier, data1)
-print_performance_metrics(ada_performance)
+data1.iloc[:, -1] = data1.iloc[:, -1].replace(0, -1)
+X = data1.iloc[:, :-1]
+y = data1.iloc[:, -1]
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=23)
+classifier.fit(x_train, y_train)
+predictions = classifier.predict(x_test)
+accuracy = accuracy_score(y_test, predictions)
+precision = precision_score(y_test, predictions, average='macro', zero_division=0)
+recall = recall_score(y_test, predictions, average='macro', zero_division=0)
+f1 = f1_score(y_test, predictions, average='macro', zero_division=0)
+performances = [accuracy, precision, recall, f1]
+print_performance_metrics(performances)
 
-classifier = ada_boost.ada_boost_classifier(8, 2)
-print("AdaBoost on dataset2")
-ada_performance = kfold_cv(classifier, data2)
-print_performance_metrics(ada_performance)
+print()
+
+classifier = ada_boost.ada_boost_classifier(3, 2)
+print("AdaBoost on dataset2:")
+data2.iloc[:, -1] = data2.iloc[:, -1].replace(0, -1)
+X = data2.iloc[:, :-1]
+y = data2.iloc[:, -1]
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=23)
+classifier.fit(x_train, y_train)
+predictions = classifier.predict(x_test)
+accuracy = accuracy_score(y_test, predictions)
+precision = precision_score(y_test, predictions, average='macro', zero_division=0)
+recall = recall_score(y_test, predictions, average='macro', zero_division=0)
+f1 = f1_score(y_test, predictions, average='macro', zero_division=0)
+performances = [accuracy, precision, recall, f1]
+print_performance_metrics(performances)
+
 
 print()
 # Create nearest neighbors classifier and run performance on 2 datasets

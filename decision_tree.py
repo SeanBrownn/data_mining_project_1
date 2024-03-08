@@ -71,7 +71,7 @@ class decision_tree_classifier:
         self.tree=self.build_tree(x_train, y_train, x_train.columns.tolist(), 0)
 
     def build_tree(self, x_train, y_train, attributes, depth):
-        first_class=y_train[0]
+        first_class=y_train.iloc[0]
 
         # labels of the current subset we are working with
         labels=decision_tree_classifier.subset_labels(x_train, y_train)
@@ -194,4 +194,4 @@ def optimal_depth():
     plt.title('error rate vs max depth of decision tree')
     plt.show()
 
-#optimal_depth()
+# optimal_depth()
