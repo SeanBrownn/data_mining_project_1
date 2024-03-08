@@ -3,7 +3,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import pandas as pd
 import main, svm
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Conduct hyperparameter tuning for the svm model
 learning_rates = [0.001, 0.01, 0.1]
@@ -14,6 +15,8 @@ Cs = [0.1, 1, 10]
 # Record the best accuracy and corresponding parameters for dataset1
 best_accuracy = 0
 best_params = {}
+
+results = []
 
 # Load the first dataset
 data1 = main.dataset1
@@ -36,11 +39,24 @@ for lr in learning_rates:
                 predictions = classifier.predict(pd.DataFrame(X_test))
                 accuracy = accuracy_score(y_test, predictions)
                 
+                results.append({'learning_rate': lr, 'lambda_param': lambda_param, 'epochs': epochs, 'C': C, 'accuracy': accuracy})
+                
                 # Update the best parameters if the current model performs better
                 if accuracy > best_accuracy:
                     best_accuracy = accuracy
                     best_params = {'learning_rate': lr, 'lambda_param': lambda_param, 'epochs': epochs, 'C': C}
-                
+
+# Convert results to DataFrame for easier analysis and plotting
+results_df = pd.DataFrame(results)
+
+# Example plot: Accuracy distribution
+plt.figure(figsize=(10, 6))
+sns.histplot(results_df['accuracy'], kde=True)
+plt.title('Distribution of Accuracies')
+plt.xlabel('Accuracy')
+plt.ylabel('Frequency')
+plt.show()
+
 print(f"Best Accuracy for datset 1: {best_accuracy}")
 print("Best Parameters for dataset 1:", best_params)
 print()
@@ -48,6 +64,8 @@ print()
 # Record the best accuracy and corresponding parameters for dataset2
 best_accuracy = 0
 best_params = {}
+
+results = []
 
 # Load the second dataset
 data2 = main.dataset2
@@ -69,11 +87,25 @@ for lr in learning_rates:
                 classifier.fit(pd.DataFrame(X_train), pd.Series(y_train))
                 predictions = classifier.predict(pd.DataFrame(X_test))
                 accuracy = accuracy_score(y_test, predictions)
+
+                results.append({'learning_rate': lr, 'lambda_param': lambda_param, 'epochs': epochs, 'C': C, 'accuracy': accuracy})
                 
                 # Update the best parameters if the current model performs better
                 if accuracy > best_accuracy:
                     best_accuracy = accuracy
                     best_params = {'learning_rate': lr, 'lambda_param': lambda_param, 'epochs': epochs, 'C': C}
                 
-print("Best Accuracy for dataset 2: {best_accuracy}")
+
+# Convert results to DataFrame for easier analysis and plotting
+results_df = pd.DataFrame(results)
+
+# Example plot: Accuracy distribution
+plt.figure(figsize=(10, 6))
+sns.histplot(results_df['accuracy'], kde=True)
+plt.title('Distribution of Accuracies')
+plt.xlabel('Accuracy')
+plt.ylabel('Frequency')
+plt.show()
+
+print(f"Best Accuracy for datset 2: {best_accuracy}")
 print("Best Parameters for dataset 2:", best_params)
