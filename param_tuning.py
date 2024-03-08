@@ -75,5 +75,5 @@ for lr in learning_rates:
                     best_accuracy = accuracy
                     best_params = {'learning_rate': lr, 'lambda_param': lambda_param, 'epochs': epochs, 'C': C}
                 
-print(f"Best Accuracy for datset 2: {best_accuracy}")
+print("Best Accuracy for dataset 2: {best_accuracy}")
 print("Best Parameters for dataset 2:", best_params)

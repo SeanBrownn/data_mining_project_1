@@ -1,8 +1,9 @@
 import unittest
 
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, export_text
 
 import decision_tree
 import main
@@ -10,117 +11,115 @@ import main
 
 class MyTestCase(unittest.TestCase):
     def test_gini(self):
-        table1 = {
-            'class': ['c2', 'c2', 'c2']
-        }
-        df1 = pd.DataFrame(table1)
-        self.assertEqual(0, decision_tree.gini(df1))
+        data1=pd.DataFrame()
+        labels_1=['c2', 'c2', 'c2']
+        self.assertEqual(0, decision_tree.decision_tree_classifier.gini(data1, labels_1))
 
-        table2 = {
-            'class': ['c1', 'c1', 'c2', 'c2', 'c2', 'c2']
+        # only initialized so it isn't empty
+        training_data = {
+            'random': [3, 4, 5]
         }
-        df2 = pd.DataFrame(table2)
-        self.assertAlmostEqual(0.444, decision_tree.gini(df2), delta=0.001)
+        data2 = pd.DataFrame(training_data)
+        self.assertEqual(0, decision_tree.decision_tree_classifier.gini(data2, labels_1))
+
+        labels_2 = ['c1', 'c1', 'c2', 'c2', 'c2', 'c2']
+        self.assertAlmostEqual(0.444, decision_tree.decision_tree_classifier.gini(data2, labels_2), delta=0.001)
 
     def test_gini_split(self):
-        parent = {
-            'class': ['c1', 'c1', 'c1', 'c1', 'c1', 'c1', 'c1', 'c2', 'c2', 'c2', 'c2', 'c2']
-        }
-        df = pd.DataFrame(parent)
-
+        # only initialize left, right subsets so that they aren't empty when gini_split calls gini() on them
         left_child = {
-            'class': ['c1', 'c1', 'c1', 'c1', 'c1', 'c2']
+            'random':[1,2,3,4,5,6]
         }
-        left_subset = pd.DataFrame(left_child)
-
+        left_subset = pd.DataFrame(left_child, index=([0,1,2,3,4,5]))
         right_child = {
-            'class': ['c1', 'c1', 'c2', 'c2', 'c2', 'c2']
+            'random':[1,2,3,4,5,6]
         }
-        right_subset = pd.DataFrame(right_child)
-        self.assertAlmostEqual(0.361, decision_tree.gini_split(df, left_subset, right_subset),
+
+        # reset index so that right_subset.index works correctly
+        right_subset = pd.DataFrame(right_child, index=([6,7,8,9,10,11]))
+        labels=[1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0]
+        self.assertAlmostEqual(0.361, decision_tree.decision_tree_classifier.gini_split(left_subset, right_subset, labels),
                                delta=0.001)
 
     def test_optimal_node(self):
         # only involves 1 attribute but tests ability to find best split point
-        data = {
-            'value': [60, 70, 75, 85, 90, 95, 100, 120, 125, 220],
-            'class': [0, 0, 0, 1, 1, 1, 0, 0, 0, 0]
+        training_data = {
+             'col': [60, 70, 75, 85, 90, 95, 100, 120, 125, 220]
         }
-        df = pd.DataFrame(data)
-        tree = decision_tree.optimal_node(df, df.columns.tolist())
-        self.assertEqual(tree, decision_tree.node('value', 97.5))
+        labels_1 = [0, 0, 0, 1, 1, 1, 0, 0, 0, 0]
+        data_1 = pd.DataFrame(training_data)
+        tree = decision_tree.decision_tree_classifier.optimal_node(data_1, labels_1, data_1.columns)
+        self.assertEqual(tree, decision_tree.decision_tree_classifier.tree('col', 97.5))
 
-        data2 = {
+        training_data_2 = {
             'x': [1, 1, 0, 1],
             'y': [1, 1, 0, 0],
-            'z': [1, 0, 1, 0],
-            'class': [1, 1, 2, 2]
+            'z': [1, 0, 1, 0]
         }
-        df2 = pd.DataFrame(data2)
-        tree2 = decision_tree.optimal_node(df2, df2.columns.tolist())
-        self.assertEqual(tree2, decision_tree.node('y', 0.5))
+        labels_2 = [1, 1, 2, 2]
+        data_2 = pd.DataFrame(training_data_2)
+        tree2 = decision_tree.decision_tree_classifier.optimal_node(data_2, labels_2, data_2.columns)
+        self.assertEqual(tree2, decision_tree.decision_tree_classifier.tree('y', 0.5))
 
-    # data used to test hunts and decision tree methods
-    data = {
-        'age': [24, 30, 36, 36, 42, 44, 46, 47, 47, 51],
-        'likes dogs': [0, 1, 0, 0, 0, 1, 1, 1, 0, 1],
-        'likes gravity': [0, 1, 1, 0, 0, 1, 0, 1, 1, 1],
-        'class': [0, 1, 1, 0, 0, 1, 0, 1, 0, 1]
-    }
-    labeled_records = pd.DataFrame(data)
-    tree = decision_tree.hunts(labeled_records, labeled_records.columns.tolist())
+    def setUp(self) -> None:
+        # data used to test hunts and decision tree methods
+        training_data = {
+            'age': [24, 30, 36, 36, 42, 44, 46, 47, 47, 51],
+            'likes dogs': [0, 1, 0, 0, 0, 1, 1, 1, 0, 1],
+            'likes gravity': [0, 1, 1, 0, 0, 1, 0, 1, 1, 1]
+        }
+        labels = [0, 1, 1, 0, 0, 1, 0, 1, 0, 1]
+        data_1 = pd.DataFrame(training_data)
 
-    def test_hunts(self):
+        self.full_classifier=decision_tree.decision_tree_classifier() # no max depth
+        self.full_classifier.fit(data_1, labels)
+
+        self.depth_2_classifier=decision_tree.decision_tree_classifier(2)
+        self.depth_2_classifier.fit(data_1, labels)
+
+    def test_fit(self):
+        # tests tree with no max depth
+
         # begin process of building the expected tree from the leaves up
-        yes_leaf = decision_tree.node(None, None, 1)
-        no_leaf = decision_tree.node(None, None, 0)
+        yes_leaf = decision_tree.decision_tree_classifier.tree(class_label=1)
+        no_leaf = decision_tree.decision_tree_classifier.tree(class_label=0)
 
-        age_node = decision_tree.node('age', 41.5, None)
+        age_node = decision_tree.decision_tree_classifier.tree('age', 41.5, None)
         age_node.left_subtree = yes_leaf
         age_node.right_subtree = no_leaf
 
-        likes_dogs_node = decision_tree.node('likes dogs', 0.5, None)
+        likes_dogs_node = decision_tree.decision_tree_classifier.tree('likes dogs', 0.5, None)
         likes_dogs_node.left_subtree = age_node
         likes_dogs_node.right_subtree = yes_leaf
 
         # root of expected tree
-        expected_tree = decision_tree.node('likes gravity', 0.5, None)
+        expected_tree = decision_tree.decision_tree_classifier.tree('likes gravity', 0.5, None)
         expected_tree.left_subtree = no_leaf
         expected_tree.right_subtree = likes_dogs_node
 
-        self.assertEqual(MyTestCase.tree, expected_tree)
+        self.assertTrue(self.full_classifier.tree.__eq__(expected_tree))
 
-    def test_classify(self):
-        data = {'age': 28, 'likes dogs': 1, 'likes gravity': 0}
-        unlabeled_record = pd.Series(data)
-        self.assertEqual(decision_tree.classify(MyTestCase.tree, unlabeled_record), 0)
+        # tests tree w/ max depth
+        likes_dogs_node.left_subtree = yes_leaf
+        self.assertTrue(self.depth_2_classifier.tree.__eq__(expected_tree))
 
-    def test_decision_tree(self):
+    def test_predict_point(self):
+        data = {
+            'age': 28,
+            'likes dogs': 1,
+            'likes gravity': 0
+        }
+        record=pd.Series(data) # use pd.Series b/c this is the same type as each row of a dataframe
+        self.assertEqual(self.full_classifier.predict_point(record), 0)
+
+    def test_predict(self):
         unlabeled_records_data = {
             'age': [28, 45, 22, 36, 51, 29, 40, 24, 33, 55],
             'likes dogs': [1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
             'likes gravity': [0, 1, 1, 0, 1, 1, 0, 1, 0, 1]
         }
         unlabeled_records = pd.DataFrame(unlabeled_records_data)
-        self.assertEqual(decision_tree.decision_tree(MyTestCase.labeled_records, unlabeled_records),
-                         [0, 0, 1, 0, 1, 1, 0, 1, 0, 1])
-
-        # tests if we classify dataset2 correctly
-        dataset2 = main.dataset2
-        dataset2_data = dataset2.iloc[:, :-1]
-        dataset2_labels = dataset2.iloc[:, -1]
-        x_train, x_test, y_train, y_test = train_test_split(dataset2_data, dataset2_labels, test_size=0.1,
-                                                            random_state=20)
-        d2_train, d2_test = train_test_split(dataset2, test_size=0.1, random_state=20)
-
-        dataset_2_classifier = DecisionTreeClassifier(random_state=20)
-        dataset_2_classifier.fit(x_train, y_train)
-        expected_labels = dataset_2_classifier.predict(x_test)
-
-        actual_labels = decision_tree.decision_tree(d2_train, d2_test)
-
-        self.assertEqual(set(actual_labels), set(expected_labels))
-
+        self.assertEqual(self.full_classifier.predict(unlabeled_records), [0, 0, 1, 0, 1, 1, 0, 1, 0, 1])
 
 if __name__ == '__main__':
     unittest.main()

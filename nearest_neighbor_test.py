@@ -11,7 +11,7 @@ def weight_function(distances):
     return np.power(distances, -2)
 
 
-class nearest_neighbor_test(unittest.TestCase):
+class MyTestCase(unittest.TestCase):
 
     def test_nearest_neighbor(self):
         dataset1 = main.dataset1
@@ -19,12 +19,13 @@ class nearest_neighbor_test(unittest.TestCase):
         dataset1_labels = dataset1.iloc[:, -1]
         x_train, x_test, y_train, y_test = train_test_split(dataset1_data, dataset1_labels, test_size=0.1,
                                                             random_state=13)
-        d1_train, d1_test = train_test_split(dataset1, test_size=0.1, random_state=13)
 
-        dataset_1_classifier = KNeighborsClassifier(n_neighbors=3, weights=weight_function)
-        dataset_1_classifier.fit(x_train, y_train)
-        expected_labels = dataset_1_classifier.predict(x_test)
+        dataset1_classifier = KNeighborsClassifier(n_neighbors=3, weights=weight_function)
+        dataset1_classifier.fit(x_train, y_train)
+        expected_labels = dataset1_classifier.predict(x_test)
 
-        actual_labels = nearest_neighbor.nearest_neighbor(d1_train, d1_test, 3)
+        knn_classifier=nearest_neighbor.knn_classifier() # k=3 by default
+        knn_classifier.fit(x_train, y_train)
+        actual_labels=knn_classifier.predict(x_test)
 
-        self.assertEqual(set(actual_labels), set(expected_labels))
+        self.assertTrue(np.array_equal(expected_labels, actual_labels))

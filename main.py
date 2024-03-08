@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
+
 dataset1=pd.read_csv("project1_dataset1.txt", header=None, delimiter='\t')
 dataset2=pd.read_csv("project1_dataset2.txt", header=None, delimiter='\t')
 
@@ -21,6 +22,8 @@ def preprocessing():
     dataset1.rename(columns={dataset1.columns[-1]: 'class'}, inplace=True)
     dataset2.rename(columns={dataset2.columns[-1]: 'class'}, inplace=True)
 
-
+    # replaces 0 labels w/ -1 for adaboost
+    dataset1['class']=dataset1['class'].replace({0:-1})
+    dataset2['class']=dataset2['class'].replace({0:-1})
 
 preprocessing()
