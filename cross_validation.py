@@ -6,8 +6,11 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import main
 import naive_bayes
 import svm
+import decision_tree
 import nearest_neighbor
+import ada_boost
 
+print("hello")
 random.seed(42)
 np.random.seed(42)
 
@@ -79,7 +82,7 @@ data1 = main.dataset1
 data2 = main.dataset2
 
 # Create Naive Bayes Classifier and run performance on 2 datasets
-naive_bayes = naive_bayes.NaiveBayesClassifier()
+'''naive_bayes = naive_bayes.NaiveBayesClassifier()
 print("Naive Bayes on dataset1:")
 naive_bayes_performance = kfold_cv(naive_bayes, data1)
 print_performance_metrics(naive_bayes_performance)
@@ -103,47 +106,41 @@ print("SVM on dataset2:")
 svm_performance = kfold_cv(classifier, data2)
 print_performance_metrics(svm_performance)
 
-def kfold_cv_nearest_neighbor(data, k):
-    folds = 10  # Define folds as 10, for simplicity
+print()'''
 
-    total_accuracy = 0
-    total_precision = 0
-    total_recall = 0
-    total_f1 = 0
+'''# Create decision tree and run performance on 2 datasets
+classifier = decision_tree.decision_tree_classifier(max_depth=6)
+print("Decision Tree on dataset1:")
+tree_performance = kfold_cv(classifier, data1)
+print_performance_metrics(tree_performance)
 
-    folds_data = split(data)  # Use the split function provided to get the folds
+classifier = decision_tree.decision_tree_classifier(max_depth=6)
+print("Decision Tree on dataset2:")
+tree_performance = kfold_cv(classifier, data2)
+print_performance_metrics(tree_performance)'''
 
-    for i in range(folds):
-        test_fold = folds_data[i]
-        train_folds = pd.concat([fold for j, fold in enumerate(folds_data) if j != i], axis=0)
+'''# Create adaboost and run performance on 2 datasets
+classifier = ada_boost.ada_boost_classifier(8, 2)
+print("AdaBoost on dataset1:")
+ada_performance = kfold_cv(classifier, data1)
+print_performance_metrics(ada_performance)
 
-        predicted_labels = nearest_neighbor.nearest_neighbor(train_folds, test_fold, k)
-
-        # Extract the true labels from the test fold
-        true_labels = test_fold.iloc[:, -1].values
-
-        # Calculate performance metrics
-        total_accuracy += accuracy_score(true_labels, predicted_labels)
-        total_precision += precision_score(true_labels, predicted_labels, average='macro', zero_division=0)
-        total_recall += recall_score(true_labels, predicted_labels, average='macro', zero_division=0)
-        total_f1 += f1_score(true_labels, predicted_labels, average='macro', zero_division=0)
-    
-    # Calculate average of each metric
-    average_accuracy = total_accuracy / folds
-    average_precision = total_precision / folds
-    average_recall = total_recall / folds
-    average_f1 = total_f1 / folds
-
-    return average_accuracy, average_precision, average_recall, average_f1
-
+classifier = ada_boost.ada_boost_classifier(8, 2)
+print("AdaBoost on dataset2")
+ada_performance = kfold_cv(classifier, data2)
+print_performance_metrics(ada_performance)'''
 
 print()
-k_value = 3
+# Create nearest neighbors classifier and run performance on 2 datasets
+classifier = nearest_neighbor.knn_classifier(k=3)
 print("Nearest Neighbors on dataset1:")
-nn_performance = kfold_cv_nearest_neighbor(data1, k_value)
-print_performance_metrics(nn_performance)
+knn_performance = kfold_cv(classifier, data1)
+print_performance_metrics(knn_performance)
+
 print()
+
+classifier = nearest_neighbor.knn_classifier(k=3)
 print("Nearest Neighbors on dataset2:")
-nn_performance = kfold_cv_nearest_neighbor(data2, k_value)
-print_performance_metrics(nn_performance)
-print()
+knn_performance = kfold_cv(classifier, data2)
+print_performance_metrics(knn_performance)
+
