@@ -101,4 +101,4 @@ def optimal_k():
     plt.title('error rate vs number of weak learners')
     plt.show()
 
-optimal_k()
+# optimal_k()

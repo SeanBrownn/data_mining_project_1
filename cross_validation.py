@@ -10,7 +10,6 @@ import decision_tree
 import nearest_neighbor
 import ada_boost
 
-print("hello")
 random.seed(42)
 np.random.seed(42)
 
@@ -82,7 +81,7 @@ data1 = main.dataset1
 data2 = main.dataset2
 
 # Create Naive Bayes Classifier and run performance on 2 datasets
-'''naive_bayes = naive_bayes.NaiveBayesClassifier()
+naive_bayes = naive_bayes.NaiveBayesClassifier()
 print("Naive Bayes on dataset1:")
 naive_bayes_performance = kfold_cv(naive_bayes, data1)
 print_performance_metrics(naive_bayes_performance)
@@ -106,9 +105,9 @@ print("SVM on dataset2:")
 svm_performance = kfold_cv(classifier, data2)
 print_performance_metrics(svm_performance)
 
-print()'''
+print()
 
-'''# Create decision tree and run performance on 2 datasets
+# Create decision tree and run performance on 2 datasets
 classifier = decision_tree.decision_tree_classifier(max_depth=6)
 print("Decision Tree on dataset1:")
 tree_performance = kfold_cv(classifier, data1)
@@ -117,9 +116,9 @@ print_performance_metrics(tree_performance)
 classifier = decision_tree.decision_tree_classifier(max_depth=6)
 print("Decision Tree on dataset2:")
 tree_performance = kfold_cv(classifier, data2)
-print_performance_metrics(tree_performance)'''
+print_performance_metrics(tree_performance)
 
-'''# Create adaboost and run performance on 2 datasets
+# Create adaboost and run performance on 2 datasets
 classifier = ada_boost.ada_boost_classifier(8, 2)
 print("AdaBoost on dataset1:")
 ada_performance = kfold_cv(classifier, data1)
@@ -128,12 +127,12 @@ print_performance_metrics(ada_performance)
 classifier = ada_boost.ada_boost_classifier(8, 2)
 print("AdaBoost on dataset2")
 ada_performance = kfold_cv(classifier, data2)
-print_performance_metrics(ada_performance)'''
+print_performance_metrics(ada_performance)
 
 print()
 # Create nearest neighbors classifier and run performance on 2 datasets
-classifier = nearest_neighbor.knn_classifier(k=3)
 print("Nearest Neighbors on dataset1:")
+classifier = nearest_neighbor.knn_classifier(k=3)
 knn_performance = kfold_cv(classifier, data1)
 print_performance_metrics(knn_performance)
 
